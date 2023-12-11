@@ -8,9 +8,8 @@ let deleteButton = document.querySelector('.delete');
 
 
 display.textContent = "";
-let operator = '';
-let firstNumber = '';
-let secondNumber = '';
+let operator = null;
+
 
 
 deleteButton.addEventListener('click', () => {
@@ -32,26 +31,41 @@ getOperator.forEach((op) => {
 });
 
 function handleNumber(num){
-
     display.textContent += num;
-    
-    if(operator === ""){
-        firstNumber += num;
+}
+
+
+function firstNum(){
+    const operatorIndex = display.textContent.indexOf(operator);
+    if(operatorIndex !== -1){
+     return parseFloat(display.textContent.slice(0, operatorIndex));
     }else{
-        secondNumber += num;
+        return null;
     }
 }
 
+function secondNum(){
+    const operatorIndex = display.textContent.indexOf(operator);
+    if(operatorIndex !== -1){
+    return parseFloat(display.textContent.slice(operatorIndex + operator.length));
+    }else{
+        return null;
+    }
+}
+
+
 function handleOperator(op){
     operator = op;
-    firstNumber = parseFloat(display.textContent);
-    display.textContent += "" + operator + "";
+    display.textContent += operator;
 }
 
 
 
 getResult.addEventListener('click', () => {
     display.textContent = operate();
+    if(!operator){
+        display.textContent = "You need a second number!";
+    }
 })
 
 
@@ -71,14 +85,20 @@ function divide(a,b){
 }
 
 function operate(){
-    secondNumber = parseFloat(display.textContent);
     if(operator == "+"){
-        return add(firstNumber, secondNumber);
+        return add(firstNum(), secondNum());
     }else if(operator == "-"){
-        return subtract(firstNumber, secondNumber);
+        return subtract(firstNum(), secondNum());
     }else if(operator == "x"){
-        return multiply(firstNumber, secondNumber);
+        return multiply(firstNum(), secondNum());
     }else if(operator == "/"){
-        return divide(firstNuber, secondNumber);
+        return divide(firstNum(), secondNum());
     }
 }
+
+
+//things to work on:
+//set up the decimal and make it work
+//limit the amount of operators
+//set up for negative numbers
+//look into how i can get undfined or errors on calculator when dividing by 0
