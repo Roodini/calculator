@@ -1,71 +1,85 @@
 let getNum = document.querySelectorAll('.number');
-let display = document.querySelector('.total');
+let currentOperationScreen = document.querySelector('.current');
+let lastOperationScreen = document.querySelector('.last');  // Fix the class name here
 let getOperator = document.querySelectorAll('.operator');
 let getResult = document.querySelector('.equals');
 let clearButton = document.querySelector('.clear');
 let deleteButton = document.querySelector('.delete');
+let decimal = document.querySelector('.decimal');
 
-
-
-display.textContent = "";
-let operator = null;
-
-
+let firstNum = '';
+let secondNum = '';
+let currentOperator = null;
+let shouldResetScreen = false;
 
 deleteButton.addEventListener('click', () => {
-    display.textContent = display.textContent.slice(0,-1);
-})
+    currentOperationScreen.textContent = currentOperationScreen.textContent.slice(0, -1);
+});
+
 clearButton.addEventListener('click', () => {
-    display.textContent = "";
-})
+    currentOperationScreen.textContent = "0";
+    lastOperationScreen.textContent = '';
+    firstNum = "";
+    secondNum = "";
+    currentOperator = null;
+});
+
 getNum.forEach((number) => {
     number.addEventListener('click', (e) => {
-    handleNumber(e.target.textContent);
+        handleNumber(e.target.textContent);
     });
 });
 
 getOperator.forEach((op) => {
     op.addEventListener('click', (e) => {
-       handleOperator(e.target.textContent);
+        getOperation(e.target.textContent);
     });
 });
 
 function handleNumber(num){
-    display.textContent += num;
-}
-
-
-function firstNum(){
-    const operatorIndex = display.textContent.indexOf(operator);
-    if(operatorIndex !== -1){
-     return parseFloat(display.textContent.slice(0, operatorIndex));
-    }else{
-        return null;
+    if (currentOperationScreen.textContent === '0' || shouldResetScreen){
+    resetScreen();
+    }
+    currentOperationScreen.textContent += num
+    if(currentOperationScreen.textContent.includes(decimal)){
+        currentOperationScreen.textContent += '.';
     }
 }
 
-function secondNum(){
-    const operatorIndex = display.textContent.indexOf(operator);
-    if(operatorIndex !== -1){
-    return parseFloat(display.textContent.slice(operatorIndex + operator.length));
-    }else{
-        return null;
+function resetScreen(){
+    currentOperationScreen.textContent = '';
+    shouldResetScreen = false;
+}
+
+function getOperation(operator) {
+    if (currentOperator !== null) evaluate();
+    firstNum = currentOperationScreen.textContent;
+    currentOperator = operator;
+    lastOperationScreen.textContent = `${firstNum} ${currentOperator}`;
+    shouldResetScreen = true;
+}
+
+function evaluate(){
+    if(currentOperator == null) return;
+    if(currentOperator == "/" && currentOperationScreen.textContent == '0'){
+        alert("You can't divide by 0! Press Clear and try again");
     }
+    secondNum = currentOperationScreen.textContent;
+    let result = operate(firstNum, secondNum);
+    currentOperationScreen.textContent = roundAnswer(result);
+
+    lastOperationScreen.textContent = `${firstNum} ${currentOperator} ${secondNum} =`
+    currentOperator = null;
+    
+    firstNum = "";
+    secondNum = "";
+    shouldResetScreen = true;
 }
-
-
-function handleOperator(op){
-    operator = op;
-    display.textContent += operator;
-}
-
 
 
 getResult.addEventListener('click', () => {
-    display.textContent = operate();
-    if(!operator){
-        display.textContent = "You need a second number!";
-    }
+    evaluate();
+    
 })
 
 
@@ -84,15 +98,22 @@ function divide(a,b){
     return a/b;
 }
 
-function operate(){
-    if(operator == "+"){
-        return add(firstNum(), secondNum());
-    }else if(operator == "-"){
-        return subtract(firstNum(), secondNum());
-    }else if(operator == "x"){
-        return multiply(firstNum(), secondNum());
-    }else if(operator == "/"){
-        return divide(firstNum(), secondNum());
+function roundAnswer(number){
+    return Math.round(number * 100) / 100;
+}
+
+
+function operate(a, b){
+    a = Number(a);
+    b = Number(b);
+    if(currentOperator == "+"){
+        return add(a, b);
+    }else if(currentOperator == "-"){
+        return subtract(a, b);
+    }else if(currentOperator == "x"){
+        return multiply(a, b);
+    }else if(currentOperator == "/"){
+        return divide(a, b);
     }
 }
 
@@ -102,3 +123,20 @@ function operate(){
 //limit the amount of operators
 //set up for negative numbers
 //look into how i can get undfined or errors on calculator when dividing by 0
+//function firstNum(){
+    //const operatorIndex = display.textContent.indexOf(operator);
+    //if(operatorIndex !== -1){
+     //return parseFloat(display.textContent.slice(0, operatorIndex));
+    //}else{
+       // return null;
+    //}
+//}
+
+//function secondNum(){
+    //const operatorIndex = display.textContent.indexOf(operator);
+    //if(operatorIndex !== -1){
+    //return parseFloat(display.textContent.slice(operatorIndex + operator.length));
+    //}else{
+        //return null;
+    //}
+//}

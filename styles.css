@@ -57,3 +57,10 @@ body{
     font-size: 30px;
     border: 2px solid black;
 }
+
+.last{
+    font-size: 20px;
+}
+.current{
+    font-size: 40px;
+}
